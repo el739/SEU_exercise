@@ -41,7 +41,7 @@ python3 run.py
 
 1. 打开电脑端微信，运行小程序“东南大学体育管理”并登录自己的账号。
 2. 进入“锻炼”界面。
-   ![小程序主界面](files/miniapp_main_menu.png)
+![小程序主界面](files/miniapp_main_menu.png)
 
 ### 用Cheat Engine打开小程序
 
