@@ -82,14 +82,14 @@ token值通常只在小程序启动后1分钟内可见。如果未找到，请�
 
 #### 方法二：获取小程序的openid并重新登陆
 
-1、在搜索框输入`{"data":"`
+1. 在搜索框输入`{"data":"`
 2. 点击"First scan"
-3、依次按Ctrl+B查看每个搜索结果的data对应值，直到找到一串约20个数字+字母（一般以`ok`开头）。
+3. 依次按Ctrl+B查看每个搜索结果的data对应值，直到找到一串约20个数字+字母（一般以`ok`开头）。
 ![搜索OpenId1](files/search_openid_1.png)
 ![搜索OpenId2](files/search_openid_2.png)
 4. 复制该值，并保存备用。
-5、双击运行login.exe，依次填入身份证号、一卡通号、openid
-6、将程序输出的token、Student Id复制，并填写到本软件中的相应位置。
+5. 双击运行login.exe，依次填入身份证号、一卡通号、openid
+6. 将程序输出的token、Student Id复制，并填写到本软件中的相应位置。
 ![获取凭证](files/credentials_got.png)
 
 *此值的混淆项颇多，但是较为稳定地存在。
