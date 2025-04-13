@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地图路径点标记工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        #map {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        .point-list {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            padding: 8px 12px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-top: 10px;
+        }
+
+        .boundary {
+            color: red;
+            font-weight: bold;
+        }
+
+        .added-point {
+            color: blue;
+        }
+
+        .file-input {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>地图路径点标记工具</h1>
+
+    <div class="file-input">
+        <label for="boundaryFile">上传规则JSON文件：</label>
+        <input type="file" id="boundaryFile" accept=".json">
+    </div>
+
+    <div class="controls">
+        <button id="clearPoints">清除所有添加的点</button>
+        <button id="exportPoints">导出JSON</button>
+    </div>
+
+    <div id="map"></div>
+
+    <div class="point-list">
+        <h2>已添加路径点列表</h2>
+        <table id="pointsTable">
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>纬度 (Lat)</th>
+                    <th>经度 (Lng)</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 动态生成 -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="export-area">
+        <h2>导出结果</h2>
+        <textarea id="exportResult" readonly></textarea>
+    </div>
+
+    <script>
+        // 默认边界数据
+        let boundaryData = {
+            "paths": [
+                {
+                    "lat": 31.882039875957734,
+                    "lng": 118.81461408311532,
+                    "height": 0
+                },
+                {
+                    "lat": 31.882049257364493,
+                    "lng": 118.81490912436834,
+                    "height": 0
+                },
+                {
+                    "lat": 31.882078878746217,
+                    "lng": 118.81503822562968,
+                    "height": 0
+                },
+                {
+                    "lat": 31.882104328015565,
+                    "lng": 118.8151947043068,
+                    "height": 0
+                },
+                {
+                    "lat": 31.882111387387518,
+                    "lng": 118.81536493085946,
+                    "height": 0
+                },
+                {
+                    "lat": 31.88211297976667,
+                    "lng": 118.81552091236756,
+                    "height": 0
+                },
+                {
+                    "lat": 31.882093220075536,
+                    "lng": 118.81570557681368,
+                    "height": 0
+                },
+                {
+                    "lat": 31.881832508053783,
+                    "lng": 118.81572932160975,
+                    "height": 0
+                },
+                {
+                    "lat": 31.881304966800094,
+                    "lng": 118.8157734227915,
+                    "height": 0
+                },
+                {
+                    "lat": 31.881054038564347,
+                    "lng": 118.81578865812128,
+                    "height": 0
+                },
+                {
+                    "lat": 31.880785582754434,
+                    "lng": 118.81580730423332,
+                    "height": 0
+                },
+                {
+                    "lat": 31.880500099905696,
+                    "lng": 118.81582957104365,
+                    "height": 0
+                },
+                {
+                    "lat": 31.88047124173211,
+                    "lng": 118.81564187051595,
+                    "height": 0
+                },
+                {
+                    "lat": 31.88044401949469,
+                    "lng": 118.8153890688344,
+                    "height": 0
+                },
+                {
+                    "lat": 31.88042486337312,
+                    "lng": 118.81519976052982,
+                    "height": 0
+                },
+                {
+                    "lat": 31.88041532518613,
+                    "lng": 118.81508394000207,
+                    "height": 0
+                },
+                {
+                    "lat": 31.880414105784673,
+                    "lng": 118.81497139945122,
+                    "height": 0
+                },
+                {
+                    "lat": 31.880388337123918,
+                    "lng": 118.81472368828122,
+                    "height": 0
+                }
+            ],
+            "styleId": "default",
+            "rank": 0,
+            "id": "55B6270B-5E3F-44A0-99D4-ED031EAC504B"
+        };
+
+        // 存储添加的路径点
+        let pathPoints = [];
+
+        // 从文件加载边界数据
+        function loadBoundaryFromFile(file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                try {
+                    const jsonData = JSON.parse(e.target.result);
+                    if (jsonData && jsonData.paths && Array.isArray(jsonData.paths)) {
+                        boundaryData = jsonData;
+                        drawMap();
+                        alert("边界数据加载成功！");
+                    } else {
+                        alert("无效的边界数据格式！");
+                    }
+                } catch (error) {
+                    alert("解析JSON文件失败：" + error.message);
+                }
+            };
+
+            reader.onerror = function () {
+                alert("读取文件失败！");
+            };
+
+            reader.readAsText(file);
+        }
+
+        // 简单的地图绘制函数
+        function drawMap() {
+            const map = document.getElementById('map');
+            const ctx = document.createElement('canvas').getContext('2d');
+            map.innerHTML = '';
+
+            // 创建地图画布
+            const canvas = document.createElement('canvas');
+            canvas.width = map.clientWidth;
+            canvas.height = map.clientHeight;
+            map.appendChild(canvas);
+
+            const mapCtx = canvas.getContext('2d');
+
+            // 找出边界范围
+            const lats = boundaryData.paths.map(p => p.lat);
+            const lngs = boundaryData.paths.map(p => p.lng);
+
+            const minLat = Math.min(...lats);
+            const maxLat = Math.max(...lats);
+            const minLng = Math.min(...lngs);
+            const maxLng = Math.max(...lngs);
+
+            // 添加缓冲区使边界不会太靠边
+            const latBuffer = (maxLat - minLat) * 0.2;
+            const lngBuffer = (maxLng - minLng) * 0.2;
+
+            const mapBounds = {
+                minLat: minLat - latBuffer,
+                maxLat: maxLat + latBuffer,
+                minLng: minLng - lngBuffer,
+                maxLng: maxLng + lngBuffer
+            };
+
+            // 坐标转换函数
+            function latLngToXY(lat, lng) {
+                // 计算统一缩放比例
+                const scaleX = canvas.width / (mapBounds.maxLng - mapBounds.minLng);
+                const scaleY = canvas.height / (mapBounds.maxLat - mapBounds.minLat);
+                const scale = Math.min(scaleX, scaleY);
+                // 计算偏移量，使绘制区域居中
+                const offsetX = (canvas.width - (mapBounds.maxLng - mapBounds.minLng) * scale) / 2;
+                const offsetY = (canvas.height - (mapBounds.maxLat - mapBounds.minLat) * scale) / 2;
+
+                // 转换经纬度为画布上的 x, y 坐标
+                const x = (lng - mapBounds.minLng) * scale + offsetX;
+                // 由于画布 y=0 在顶部，所以将 y 坐标倒置
+                const y = canvas.height - ((lat - mapBounds.minLat) * scale + offsetY);
+                return { x, y };
+            }
+
+            function xyToLatLng(x, y) {
+                // 同样先计算统一缩放比例和偏移量
+                const scaleX = canvas.width / (mapBounds.maxLng - mapBounds.minLng);
+                const scaleY = canvas.height / (mapBounds.maxLat - mapBounds.minLat);
+                const scale = Math.min(scaleX, scaleY);
+                const offsetX = (canvas.width - (mapBounds.maxLng - mapBounds.minLng) * scale) / 2;
+                const offsetY = (canvas.height - (mapBounds.maxLat - mapBounds.minLat) * scale) / 2;
+
+                // 将画布坐标转换回经纬度
+                const lng = (x - offsetX) / scale + mapBounds.minLng;
+                // y 方向倒置转换
+                const lat = (canvas.height - y - offsetY) / scale + mapBounds.minLat;
+                return { lat, lng };
+            }
+
+
+            // 绘制背景
+            mapCtx.fillStyle = '#f0f0f0';
+            mapCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制边界
+            mapCtx.beginPath();
+            const firstPoint = latLngToXY(boundaryData.paths[0].lat, boundaryData.paths[0].lng);
+            mapCtx.moveTo(firstPoint.x, firstPoint.y);
+
+            for (let i = 1; i < boundaryData.paths.length; i++) {
+                const point = latLngToXY(boundaryData.paths[i].lat, boundaryData.paths[i].lng);
+                mapCtx.lineTo(point.x, point.y);
+            }
+
+            // 闭合路径
+            mapCtx.lineTo(firstPoint.x, firstPoint.y);
+
+            mapCtx.strokeStyle = 'red';
+            mapCtx.lineWidth = 2;
+            mapCtx.stroke();
+
+            // 标记边界点
+            boundaryData.paths.forEach((point, index) => {
+                const { x, y } = latLngToXY(point.lat, point.lng);
+
+                mapCtx.beginPath();
+                mapCtx.arc(x, y, 5, 0, Math.PI * 2);
+                mapCtx.fillStyle = 'red';
+                mapCtx.fill();
+
+                // 标记边界点索引
+                mapCtx.fillStyle = 'black';
+                mapCtx.font = '12px Arial';
+                mapCtx.fillText(`B${index + 1}`, x + 8, y - 8);
+            });
+
+            // 标记添加的路径点
+            pathPoints.forEach((point, index) => {
+                const { x, y } = latLngToXY(point.lat, point.lng);
+
+                mapCtx.beginPath();
+                mapCtx.arc(x, y, 5, 0, Math.PI * 2);
+                mapCtx.fillStyle = 'blue';
+                mapCtx.fill();
+
+                mapCtx.fillStyle = 'black';
+                mapCtx.font = '12px Arial';
+                mapCtx.fillText(index + 1, x + 8, y);
+            });
+
+            // 点击地图添加新路径点
+            canvas.addEventListener('click', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const { lat, lng } = xyToLatLng(x, y);
+
+                // 添加新点
+                pathPoints.push({
+                    lat: parseFloat(lat.toFixed(14)),
+                    lng: parseFloat(lng.toFixed(14)),
+                    sortNum: pathPoints.length + 1
+                });
+
+                // 更新表格和地图
+                updatePointsTable();
+                drawMap();
+            });
+        }
+
+        // 更新路径点表格
+        function updatePointsTable() {
+            const tbody = document.querySelector('#pointsTable tbody');
+            tbody.innerHTML = '';
+
+            pathPoints.forEach((point, index) => {
+                const tr = document.createElement('tr');
+
+                tr.innerHTML = `
+                    <td>${point.sortNum}</td>
+                    <td>${point.lat}</td>
+                    <td>${point.lng}</td>
+                    <td>
+                        <button class="delete-btn" data-index="${index}">删除</button>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+
+            // 添加删除按钮事件
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.getAttribute('data-index'));
+                    pathPoints.splice(index, 1);
+
+                    // 更新序号
+                    pathPoints.forEach((point, i) => {
+                        point.sortNum = i + 1;
+                    });
+
+                    updatePointsTable();
+                    drawMap();
+                });
+            });
+        }
+
+        // 导出JSON
+        function exportJSON() {
+            const exportData = JSON.stringify(pathPoints, null, 4);
+            document.getElementById('exportResult').value = exportData;
+
+            // 创建 Blob 对象
+            const blob = new Blob([exportData], { type: 'application/json' });
+
+            // 创建临时链接进行下载
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'track.json';
+            document.body.appendChild(a);
+            a.click();
+
+            // 清理
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            drawMap();
+
+            // 文件选择监听
+            document.getElementById('boundaryFile').addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    loadBoundaryFromFile(e.target.files[0]);
+                }
+            });
+
+            // 清除所有点
+            document.getElementById('clearPoints').addEventListener('click', () => {
+                pathPoints = [];
+                updatePointsTable();
+                drawMap();
+                document.getElementById('exportResult').value = '';
+            });
+
+            // 导出JSON
+            document.getElementById('exportPoints').addEventListener('click', exportJSON);
+        });
+
+        // 窗口大小改变时重绘地图
+        window.addEventListener('resize', drawMap);
+    </script>
+</body>
+
+</html>
