@@ -1,134 +1,128 @@
 # SEU_exercise
 
-是否因为小程序总是出现故障而导致无法保存锻炼记录？还是因为校园网络环境较差让你总是卡在加载界面？那么，这款程序将完美解决这些问题！SEU_exercise可以直接将运动数据上传至服务器，无需通过官方小程序！
+## 简介
 
-## 使用教程
+一款解决东南大学体育锻炼打卡问题的工具。无需通过官方小程序，直接将运动数据上传至服务器，避免网络问题和加载卡顿。
 
-### 下载本程序
+## 功能特点
 
-#### 方法1
+- 绕过官方小程序直接上传运动数据
+- 支持自定义运动时间、距离和照片
+- 稳定可靠，不受校园网络环境影响
 
-请前往[发布页](https://github.com/el739/SEU_exercise/releases)下载本程序。
+## 安装指南
 
-#### 方法2
+### 方法1：直接下载
 
-或者，如果你有Python运行时，可以直接克隆本项目
+从[发布页](https://github.com/el739/SEU_exercise/releases)下载最新版本的程序。
+
+### 方法2：源码运行
+
+需要Python环境：
 
 ```bash
 git clone https://github.com/el739/SEU_exercise.git
 cd SEU_exercise
-```
-
-安装所需依赖并运行
-
-```bash
 pip3 install -r requirements.txt
 python3 run.py
 ```
 
-### 
-
-若运行成功，界面应当如图所示
 ![主界面](files/main_program.png)
 
-### 安装并运行Cheat Engine
+## 使用教程
 
-1. 访问[Cheat Engine](https://www.cheatengine.org/)官网，下载并安装Cheat Engine。
-2. 双击打开软件，跳过教程，进入主界面。
-   ![Cheat Engine主界面](files/cheat_engine_main_menu.png)
+### 准备工作
 
-### 运行官方小程序
-
-1. 打开电脑端微信，运行小程序“东南大学体育管理”并登录自己的账号。
-2. 进入“锻炼”界面。
+1. 下载并安装[Cheat Engine](https://www.cheatengine.org/)
+2. 打开电脑端微信
+3. 运行"东南大学体育管理"小程序并登录
+4. 进入"锻炼"界面，如图：
    ![小程序主界面](files/miniapp_main_menu.png)
 
-### 用Cheat Engine打开小程序
+### 配置Cheat Engine
 
-![用Cheat Engine打开小程序](files/choose_process.png)
+1. 启动Cheat Engine并跳过教程
+2. 点击左上角进程选择图标，选择微信小程序进程
+3. 将搜索类型改为"String"（字符串）
+   ![用Cheat Engine打开小程序](files/choose_process.png)
+   ![将搜索类型改为字符串](files/search_string.png)
 
-### 搜索并配置必要字段
+### 获取必要凭证的两种方法
 
-首先，由于我们关注的信息（如登录凭证、个人ID等）以字符串形式存储，因此需将搜索目标改为字符串。
+#### 方法一：直接获取token和id
 
-![将搜索类型改为字符串](files/search_string.png)
+##### 1. 获取token
 
-#### 获取自己的token
-
-token是最重要的登录凭证，由一串长长的数字、字母和符号组成。
-在搜索框中输入`Bearer `（注意末尾有一个空格），然后点击`First scan`。
-![搜索token_1](files/search_token_1.png)
-
-在结果中会出现多个条目。点击最后一个结果，然后按下Ctrl+B，将弹出一个新窗口。
-![搜索token_2](files/search_token_2.png)
-![搜索token_3](files/search_token_3.png)
-
-此时，`Bearer `后面的部分（即图片中标红的部分，`eyJ0eXAiOiJKc2.....HrwyN0`）就是你需要的token。选中它并按Ctrl+C复制。
-接着，将这串字符复制到本程序的token输入框中，如图。
-![编辑token](files/edit_token.png)
+1. 在搜索框中输入`Bearer `（注意末尾有空格）
+2. 点击"First scan"
+3. 在搜索结果中选择最后一个条目
+4. 按Ctrl+B打开内存查看器
+5. 找到并选择`Bearer `后面的一长串无规则字符（通常包含字母、数字和符号）
+6. 复制该字符串到程序的token输入框
+   ![搜索token_1](files/search_token_1.png)
+   ![搜索token_2](files/search_token_2.png)
+   ![搜索token_3](files/search_token_3.png)
+   ![编辑token](files/edit_token.png)
 
 *注：如果未能找到一串无规则字符串，请使用相同的方法查看第二个、第三个地址，直到找到token。如果所有地址均没有，则尝试打开小程序的其他页面，重复以上步骤。
-实测发现，此值仅在官方小程序启动后1分钟内出现，时间过长则会自动消失，尚不清楚原因。若操作时间过长导致所有搜索结果中均未发现有效的token值，则应利用任务管理器彻底结束小程序进程，再重复操作。*
+token值通常只在小程序启动后1分钟内可见。如果未找到，请重启小程序重试。*
 
-#### 获取自己的tenant
+##### 2. 获取id
 
-成功获取token后，保持Memory_viewer对话框的打开状态，稍微向上滚动地址区域，可以找到自己的tenant值。tenant值的末尾应该是两个等号。
-![获取tenant](files/get_tenant.png)
+1. 在搜索框中输入`\"id\":\"`
+2. 点击"First scan"
+3. 选择搜索结果并按Ctrl+B
+4. 找到约18位的数字（通常以3开头）
+5. 复制该值到程序的id输入框
+   ![搜索id_1](files/search_id_1.png)
+   ![搜索id_2](files/search_id_2.png)
+   ![编辑id](files/edit_id.png)
 
-同上，在主程序中填入tenant值。
-![编辑tenant](files/edit_tenant.png)
+*同上，若没有找到正确的id值，则尝试重启小程序并重试。`id`一定是一串约18位的数字，实际查看时有诸多混淆项，请注意辨别。*
 
-#### 获取自己的id
+#### 方法二：获取小程序的openid并重新登陆
 
-与获取token时类似，在输入框中输入`\"id\":\"`并进行搜索。
-![搜索id_1](files/search_id_1.png)
+1、在搜索框输入`{"data":"`
+2. 点击"First scan"
+3、依次按Ctrl+B查看每个搜索结果的data对应值，直到找到一串约20个数字+字母（一般以`ok`开头）。
+![搜索OpenId1](files/search_openid_1.png)
+![搜索OpenId2](files/search_openid_2.png)
+4. 复制该值，并保存备用。
+5、双击运行login.exe，依次填入身份证号、一卡通号、openid
+6、将程序输出的token、Student Id复制，并填写到本软件中的相应位置。
+![获取凭证](files/credentials_got.png)
 
-单击得到的地址，按Ctrl+B，即可找到你的id。id一定是约18位的数字，大多数情况下都以3开头。
-![搜索id_2](files/search_id_2.png)
+*此值的混淆项颇多，但是较为稳定地存在。
+若程序没有输出这两项值，而是返回结果中包括“该用户已被其他微信账号绑定”字样，则代表OpenId有误，需返回第三步重新寻找。*
 
-同上，在主程序中填入id值。
-![编辑id](files/edit_id.png)
+### 2. 配置运动信息
 
-*同上，若没有找到正确的id值，则尝试重启小程序并重试。*
+在主程序界面填写：
 
-至此，繁琐的凭证获取过程结束了，可以关闭Cheat Engine，接下来可以配置其他选项。
+| 字段 | 说明 | 格式示例 |
+|------|------|----------|
+| Start Image | 开始运动照片 | 文件路径 |
+| Finish Image | 结束运动照片 | 文件路径 |
+| Date | 运动日期 | 2025-04-01 |
+| Start Time | 开始时间 | 18:00:00 |
+| Finish Time | 结束时间 | 18:08:00 |
+| Distance | 运动距离(km) | 1.24 |
 
-### 配置跑步信息
+### 3. 运行程序
 
-本程序中，其他字段的作用分别如下：
-
-| 字段名 | 说明 | 备注 |
-| --- | --- | --- |
-| Start Image | 希望官方小程序锻炼开始的照片 | 输入文件路径（无须转义）或点击`Browse`浏览本地文件 |
-| Finish Image | 希望官方小程序锻炼结束的照片 | 同上 |
-| Date | 锻炼日期 | 格式YYYY-MM-DD，例如`2025-04-01` |
-| Start Time | 锻炼开始时间 | 格式HH:MM:SS，例如`18:00:00` |
-| Finish Time | 锻炼结束时间 | 同上 |
-| Distance | 锻炼距离 | 单位为km |
-| Calorie | 本次消耗的卡路里 | 若无需求保持默认即可 |
-
-### 运行主程序
-
-先点击`Save Changes`将配置文件保存，然后填入你的 Licecse Key （目前可填入`LOVESEU`），单击`Run`，程序即开始运行，此时可在右侧观察到输出的日志记录。
-当弹窗显示`Operation completed successfully!`或右侧日志区中输出`INFO - Record added successfully`时，即成功上传自己的运动记录。
-![运行成功示例](files/save_succeeded.png)
-此时可前往官方小程序查看上传结果。
-![运行结果](files/result.png)
-
-*注：连续多次运行时，或者将来再次运行时，每次运行之前都应该点击`Save Changes`保存配置信息，否则配置将不会生效！*
+1. 点击"Save Changes"保存配置
+2. 输入License Key（当前可用：`LOVESEU`）
+3. 点击"Run"开始运行
+4. 等待成功提示
 
 ## 故障排查
 
-程序运行日志将实时输出在右侧的文本框中，如程序报错可在此查看记录。项目初期错误处理尚不完善，希望大家能够提交issue帮助我们改进！
+程序运行日志实时显示在右侧文本框，可用于排查问题。项目初期错误处理尚不完善，希望大家能够提交issue帮助我们改进！
 
 ### 常见问题
 
 ![SSLerror](files/SSLerr.jpg)
 一般是网络问题，此时电脑连接手机热点即可解决（注意，手机也需要使用流量，不使用校园网）。若连接热点后仍然无法解决，则应重新检查凭证是否正确。
-
-## 获取运行程序所需的 License key
-
-目前使用key`LOVESEU`即可激活本程序（限前1000次使用）。
 
 ## 免责声明
 
@@ -140,3 +134,7 @@ token是最重要的登录凭证，由一串长长的数字、字母和符号组
 4. **使用条款**：通过使用本程序，用户即表示同意遵守上述条款，并理解相关责任。我们保留随时修改本免责声明的权利，修改后的免责声明将在本程序中发布。
 
 感谢您对本程序的支持与使用！希望您能够诚实记录锻炼信息，共同营造积极健康的校园氛围。
+
+## License
+
+使用key：`LOVESEU`（限前1000次使用）
