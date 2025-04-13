@@ -113,7 +113,10 @@ token值通常只在小程序启动后1分钟内可见。如果未找到，请�
 1. 点击"Save Changes"保存配置
 2. 输入License Key（当前可用：`LOVESEU`）
 3. 点击"Run"开始运行
-4. 等待成功提示
+4. 等待成功提示。当弹窗显示`Operation completed successfully!`或右侧日志区中输出`INFO - Record added successfully`时，即成功上传自己的运动记录。
+![运行成功示例](files/save_succeeded.png)
+此时可前往官方小程序查看上传结果。
+![运行结果](files/result.png)
 
 ## 故障排查
 
