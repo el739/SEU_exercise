@@ -22,7 +22,6 @@ def get_login_info():
         "Sec-Fetch-Site": "cross-site",
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Dest": "empty",
-        "Referer": "https://servicewechat.com/wx5da07e9f6f45cabf/38/page-frame.html",
         "Accept-Language": "zh-CN,zh;q=0.9"
     }
 
