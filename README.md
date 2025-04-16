@@ -113,7 +113,7 @@ token值通常只在小程序启动后1分钟内可见。如果未找到，请�
 ### 3. 运行程序
 
 1. 点击"Save Changes"保存配置
-2. 输入License Key（当前可用：`LOVESEU`）
+2. 输入激活码License Key（更多信息见[获取激活码说明](docs/获取激活码.md)）
 3. 点击"Run"开始运行
 4. 等待成功提示。当弹窗显示`Operation completed successfully!`或右侧日志区中输出`INFO - Record added successfully`时，即成功上传自己的运动记录。
 ![运行成功示例](files/save_succeeded.png)
@@ -140,6 +140,6 @@ token值通常只在小程序启动后1分钟内可见。如果未找到，请�
 
 感谢您对本程序的支持与使用！希望您能够诚实记录锻炼信息，共同营造积极健康的校园氛围。
 
-## License
-
-使用key：`LOVESEU`（限前1000次使用）
+## 激活码获取
+- 感谢大家的支持，免费激活码已全部发放完毕！
+- 个人用户可以发送邮件申请试用激活码或购买付费激活码，详请参见[获取激活码说明](docs/获取激活码.md)
