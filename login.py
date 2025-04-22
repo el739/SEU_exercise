@@ -1,12 +1,35 @@
 import requests
 import json
 import sys
+import yaml
+import os
+
+def update_config(token, user_id):
+    try:
+        # 读取当前配置文件
+        with open('config.yaml', 'r', encoding='utf-8') as file:
+            config = yaml.safe_load(file)
+        
+        # 更新token和student_id
+        config['basic']['token'] = token
+        config['basic']['student_id'] = user_id
+        
+        # 写回配置文件
+        with open('config.yaml', 'w', encoding='utf-8') as file:
+            yaml.dump(config, file, allow_unicode=True)
+            
+        print("配置文件已更新成功！")
+        
+    except Exception as e:
+        print(f"更新配置文件时出错: {e}")
+        return False
+    return True
 
 def get_login_info():
     # 用户输入
+    open_id = input("请输入 OpenID: ")
     student_no = input("请输入一卡通号: ")
     id_card_no = input("请输入身份证号码: ")
-    open_id = input("请输入 OpenID: ")
 
     # 定义请求头
     headers = {
@@ -22,6 +45,7 @@ def get_login_info():
         "Sec-Fetch-Site": "cross-site",
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Dest": "empty",
+        "Referer": "https://servicewechat.com/wx5da07e9f6f45cabf/38/page-frame.html",
         "Accept-Language": "zh-CN,zh;q=0.9"
     }
 
@@ -57,8 +81,16 @@ def get_login_info():
         try:
             token = json_data['data']['token']
             user_id = json_data['data']['userId']
-            print(f"\nToken:\n{token}\n")
-            print(f"Student id:\n{user_id}\n")
+            print("登录成功！正在更新配置文件...")
+            
+            # 更新配置文件
+            if update_config(token, user_id):
+                print("配置更新完成。你可以直接运行run.exe了。")
+            else:
+                print("配置更新失败，请手动更新配置文件。")
+                print(f"\nToken:\n{token}\n")
+                print(f"Student id:\n{user_id}\n")
+            
             return token, user_id
         except Exception as e:
             print(f"响应中缺少必要字段: {e}")
@@ -69,7 +101,7 @@ def get_login_info():
         if isinstance(e, requests.exceptions.Timeout):
             print("请求超时")
         elif isinstance(e, requests.exceptions.ConnectionError):
-            print("连接错误")
+            print("连接错误。请使用个人手机流量连接，使用校园网会出现证书问题。")
         elif isinstance(e, requests.exceptions.HTTPError):
             print(f"HTTP错误: {response.status_code}")
         else:
@@ -77,6 +109,11 @@ def get_login_info():
         return None, None
 
 if __name__ == "__main__":
+    if not os.path.exists('config.yaml'):
+        print("错误：未找到config.yaml文件！")
+        input("Press enter to continue...")
+        sys.exit(1)
+        
     token, user_id = get_login_info()
     if token is None or user_id is None:
         input("Press enter to continue...")
