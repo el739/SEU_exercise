@@ -12,20 +12,7 @@
 
 ## 安装指南
 
-### 方法1：直接下载
-
 从[发布页](https://github.com/el739/SEU_exercise/releases)下载最新版本的程序。
-
-### 方法2：源码运行
-
-需要Python环境：
-
-```bash
-git clone https://github.com/el739/SEU_exercise.git
-cd SEU_exercise
-pip3 install -r requirements.txt
-python3 run.py
-```
 
 ![主界面](files/main_program.png)
 
